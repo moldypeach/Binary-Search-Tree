@@ -1,7 +1,15 @@
-// Fig. 22.17: Tree.java
-// TreeNode and Tree class declarations for a binary search tree.
-//package com.deitel.ch22;
-
+/* Filename:        BinarySearchTree.java
+ * Last Modified:   15 Feb 2014
+ * Author:          Todd Parker
+ * Email:           todd.i.parker@maine.edu
+ * Course:          CIS314 - Advanced Java
+ * 
+ * NOTE: Code was adopted from "Java - How To Program" by Deitel and Deitel
+ * 
+ * Tree.java is ...
+ */
+package binarysearchtree;
+import java.util.ArrayList;
 // class TreeNode definition
 class TreeNode< T extends Comparable< T > > 
 {
@@ -9,12 +17,14 @@ class TreeNode< T extends Comparable< T > >
    TreeNode< T > leftNode; // left node  
    T data; // node value
    TreeNode< T > rightNode; // right node
+   private int frequency; // Track occurance of data in Tree
 
    // constructor initializes data and makes this a leaf node
    public TreeNode( T nodeData )
    { 
       data = nodeData;              
       leftNode = rightNode = null; // node has no children
+      frequency = 1;
    } // end TreeNode constructor
 
    // locate insertion point and insert new node; ignore duplicate values
@@ -25,7 +35,7 @@ class TreeNode< T extends Comparable< T > >
       {
          // insert new TreeNode
          if ( leftNode == null )
-            leftNode = new TreeNode< T >( insertValue );
+            leftNode = new TreeNode<>( insertValue );
          else // continue traversing left subtree recursively
             leftNode.insert( insertValue ); 
       } // end if
@@ -34,11 +44,19 @@ class TreeNode< T extends Comparable< T > >
       {
          // insert new TreeNode
          if ( rightNode == null )
-            rightNode = new TreeNode< T >( insertValue );
+            rightNode = new TreeNode<>( insertValue );
          else // continue traversing right subtree recursively
             rightNode.insert( insertValue ); 
       } // end else if
+      else // Increment counter
+          frequency++;
    } // end method insert
+   
+   public int getFrequency()
+   {
+       return frequency;
+   }
+   
 } // end class TreeNode
 
 // class Tree definition
@@ -56,7 +74,7 @@ public class Tree< T extends Comparable< T > >
    public void insertNode( T insertValue )
    {
       if ( root == null )
-         root = new TreeNode< T >( insertValue ); // create root node
+         root = new TreeNode<>( insertValue ); // create root node
       else
          root.insert( insertValue ); // call the insert method
    } // end method insertNode
@@ -91,7 +109,7 @@ public class Tree< T extends Comparable< T > >
          return;
 
       inorderHelper( node.leftNode ); // traverse left subtree
-      System.out.printf( "%s ", node.data ); // output node data
+      System.out.printf( "%s (%d)", node.data, node.getFrequency() ); // output node data
       inorderHelper( node.rightNode ); // traverse right subtree
    } // end method inorderHelper
 
@@ -109,21 +127,29 @@ public class Tree< T extends Comparable< T > >
   
       postorderHelper( node.leftNode ); // traverse left subtree
       postorderHelper( node.rightNode ); // traverse right subtree
-      System.out.printf( "%s ", node.data ); // output node data
+      System.out.printf( "%s (%d)", node.data, node.getFrequency() ); // output node data
    } // end method postorderHelper
+   
+   public void outputTree()
+   {        
+        outputTreeHelper( root, 0 );
+   }
+   private void outputTreeHelper( TreeNode< T > node, int totalSpaces )
+   {       
+       while( node != null )
+       {
+           if( node.rightNode != null )
+            outputTreeHelper( node.rightNode, totalSpaces + 5 );
+           
+           for( int i = 1; i < totalSpaces; i++ )
+               System.out.print( " " );
+           
+           System.out.println( node.data );
+           
+           node = node.leftNode;
+           totalSpaces += 5;
+//           outputTreeHelper( node = node.leftNode, spaces + 10);
+       }
+   }
+   
 } // end class Tree
-
-/**************************************************************************
- * (C) Copyright 1992-2012 by Deitel & Associates, Inc. and               *
- * Pearson Education, Inc. All Rights Reserved.                           *
- *                                                                        *
- * DISCLAIMER: The authors and publisher of this book have used their     *
- * best efforts in preparing the book. These efforts include the          *
- * development, research, and testing of the theories and programs        *
- * to determine their effectiveness. The authors and publisher make       *
- * no warranty of any kind, expressed or implied, with regard to these    *
- * programs or to the documentation contained in these books. The authors *
- * and publisher shall not be liable in any event for incidental or       *
- * consequential damages in connection with, or arising out of, the       *
- * furnishing, performance, or use of these programs.                     *
- *************************************************************************/
