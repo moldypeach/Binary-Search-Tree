@@ -210,7 +210,7 @@ public class Tree< T extends Comparable< T > >
         // If no elements to insert
         if( tokens.isEmpty() )
         {
-            System.out.println( "ERROR: no input provided!" );
+            System.out.println( "ERROR: either [no|invalid] input was provided!" );
         }
         // Set root node of entire binaryTree
         else
@@ -247,18 +247,18 @@ public class Tree< T extends Comparable< T > >
    
    // Deletes a node from binaryTree by either decrementing the passed nodes
    // frequency, or by deleting the entire node if the frequency decrements to zero
-   public void deleteNode( T deleteValue )
+   public void deleteNode( T deleteValue, boolean deleteAll )
    {
+       // Get reference to node for deletion
        TreeNode< T > deleteNode = searchTreeUtility( deleteValue );
        
        // Node doesn't exist in binaryTree
        if( deleteNode == null )
-           System.out.println( "Search value not found." );
+           System.out.println( "\n\n\t Delete value not found.\n" );
        // Node is a leaf node
        else if ( (deleteNode.leftNode == null) && (deleteNode.rightNode == null) )
        {
-           System.out.println( "Node is a LEAF node " );
-           if( deleteNode.getFrequency() > 1 )
+           if( (deleteNode.getFrequency() > 1) && (!deleteAll)  )
            {
                deleteNode.decrementFrequency();
            }
@@ -269,54 +269,48 @@ public class Tree< T extends Comparable< T > >
                {
                    deleteNode.parentNode.leftNode = null;
                    deleteNode = null;
-                   System.gc();
                }
                // Set parent nodes rightNode reference to null
                else
                {
                    deleteNode.parentNode.rightNode = null;
-                   deleteNode = null;
-                   System.gc(); // call garbage collector                    
+                   deleteNode = null;                 
                }
            }
        } // end else...if for leaf node
        // Node has a single, right, child
        else if ( ( deleteNode.leftNode == null ) )
        {           
-           System.out.println(" Node has a single RIGHT child ");
-           if( deleteNode.getFrequency() > 1 )
+           if( (deleteNode.getFrequency() > 1) && (!deleteAll) )
            {
                deleteNode.decrementFrequency();
            }
            else
            {
-               // Set parent nodes leftNode reference to deleteNode's child
+               // Set parent node leftNode reference to deleteNode's child
                if( deleteNode.getNodePosition() < 0 )
                {
-                   // Set parent node of the replacement node to the parent of node being deleted
+                   // Set replacementNode parent to deleteNode parent
                    deleteNode.rightNode.parentNode = deleteNode.parentNode;
                    // Set the parentNode's leftNode to the replacement node
                    deleteNode.parentNode.leftNode = deleteNode.rightNode;
                    deleteNode = null;
-                   System.gc();
                }
-               // Set parent nodes rightNode reference to deleteNode's child
+               // Set parent node rightNode reference to deleteNode's child
                else
                {
-                   // Set parent node of the replacement node to the parent of node being deleted
+                   // Set replacementNode parent to deleteNode parent
                    deleteNode.rightNode.parentNode = deleteNode.parentNode;
                    // Set the parentNode's rightNode to the replacement node
                    deleteNode.parentNode.rightNode = deleteNode.rightNode;
-                   deleteNode = null;
-                   System.gc(); // call garbage collector                    
+                   deleteNode = null;                
                }              
            }           
        } // end else...if for node with single RIGHT child node
        // Node has a single, left, child
        else if ( ( deleteNode.rightNode == null ) )
        {
-           System.out.println(" Node has a single LEFT child ");
-           if( deleteNode.getFrequency() > 1 )
+           if( (deleteNode.getFrequency() > 1) && (!deleteAll) )
            {
                deleteNode.decrementFrequency();
            }
@@ -325,68 +319,129 @@ public class Tree< T extends Comparable< T > >
                // Set parent nodes leftNode reference to deleteNode's child
                if( deleteNode.getNodePosition() < 0 )
                {
+                   // Set replacementNode parent to deleteNode parent
+                   deleteNode.leftNode.parentNode = deleteNode.parentNode;
+                   // Set the parentNode's leftNode to the replacement node
                    deleteNode.parentNode.leftNode = deleteNode.leftNode;
                    deleteNode = null;
-                   System.gc();
                }
                // Set parent nodes rightNode reference to deleteNode's child
                else
                {
+                   // Set replacementNode parent to deleteNode parent
+                   deleteNode.leftNode.parentNode = deleteNode.parentNode;
+                   // Set the parentNode's rightNode to the replacement node
                    deleteNode.parentNode.rightNode = deleteNode.leftNode;
-                   deleteNode = null;
-                   System.gc(); // call garbage collector                    
+                   deleteNode = null;                   
                }              
            }            
        } // end else...if for node with single LEFT child node
        // Node node has two children
        else
-       {
-           TreeNode< T > tempNode; // store reference to the node being deleted
-           
-           System.out.println( "Node has TWO children" );
-           if( deleteNode.getFrequency() > 1 )
+       {           
+           if( (deleteNode.getFrequency() > 1) && (!deleteAll) )
            {
                deleteNode.decrementFrequency();
            }
            else
            {
-               tempNode = deleteNode;
+               // Store reference to the node being deleted
+               TreeNode< T > tempNode = deleteNode;
+               // Store reference to replacement node
+               TreeNode< T > replacementNode = deleteNode.leftNode;
+               // Loop control variable
+               boolean foundReplacement = false;
                
-               while (deleteNode.leftNode)
+               // Crawl down rightNodes of the first leftNode to the node being deleted
+               do
+               {                   
+                   if( replacementNode.rightNode == null )
+                   {
+                       foundReplacement = true;
+                   }
+                   else
+                       replacementNode = replacementNode.rightNode;
+                   
+               } while( !foundReplacement );
                
-               // Set parent nodes leftNode reference to deleteNode's child
-               if( deleteNode.getNodePosition() < 0 )
+               // If the replacement node is a leaf node
+               if( ( replacementNode.leftNode == null ) && ( replacementNode.rightNode == null ) )
                {
-                   deleteNode.parentNode.leftNode = deleteNode.leftNode;
+                   // Change parent node reference for node being deleted to the replacement node
+                   if( deleteNode.getNodePosition() < 0 )
+                   {
+                       // Set deleteNode parent leftNode reference to replacementNode
+                       deleteNode.parentNode.leftNode = replacementNode;                
+                   }
+                   // Set replacementNode's parent rightNode reference to null
+                   else
+                   {
+                       // Set deleteNode parent rightNode reference to replacementNode
+                       deleteNode.parentNode.rightNode = replacementNode;
+                    }
+                   
+                   // Set parentNode reference in replacementNode to null
+                   if( replacementNode.getNodePosition() < 0 )
+                   {
+                       // Set replacementNode parent leftNode reference to null
+                       replacementNode.parentNode.leftNode = null;               
+                   }
+                   else
+                   {
+                       // Set replacementNode parent rightNode reference to null
+                       replacementNode.parentNode.rightNode = null;                 
+                   }
+                   
+                   // Set replacementNode position to deleteNode position
+                   replacementNode.setNodePosition( deleteNode.getNodePosition() );                   
+                   replacementNode.parentNode = deleteNode.parentNode;
+                   replacementNode.rightNode = deleteNode.rightNode;
+                   replacementNode.leftNode = deleteNode.leftNode;
                    deleteNode = null;
-                   System.gc();
+                   
                }
-               // Set parent nodes rightNode reference to deleteNode's child
+               // Else the replacement node has a left child
                else
                {
-                   deleteNode.parentNode.rightNode = deleteNode.leftNode;
-                   deleteNode = null;
-                   System.gc(); // call garbage collector                    
-               }              
-           }            
-       }
+                   // Change parent node reference for node being deleted to the replacement node
+                   if( deleteNode.getNodePosition() < 0 )
+                   {
+                       // Set deleteNode parent leftNode reference to replacementNode
+                       deleteNode.parentNode.leftNode = replacementNode;                
+                   }
+                   // Set replacementNode's parent rightNode reference to null
+                   else
+                   {
+                       // Set deleteNode parent rightNode reference to replacementNode
+                       deleteNode.parentNode.rightNode = replacementNode;
+                    }
+                   
+                   if( replacementNode.parentNode != deleteNode)
+                   {
+                       replacementNode.parentNode.rightNode = replacementNode.leftNode;
+                       replacementNode.leftNode = deleteNode.leftNode;
+                   }
+                   
+                   // Set replacementNode position to deleteNode position
+                   replacementNode.setNodePosition( deleteNode.getNodePosition() );                   
+                   // Set replacementNode parent rightNode to the left child of replacementNode
+                   
+                   replacementNode.parentNode = deleteNode.parentNode;
+                   replacementNode.rightNode = deleteNode.rightNode;
+               }           
+           } // End else frequency = 1           
+       } // End else node has two children 
    } // end deleteNode() method
    
-   // Deletes a node from the binaryTree regardless of its frequency
-   public void deleteNode( T deleteValue, boolean deleteAllNodes )
-   {
-   
-   }
-   
    // Search the binaryTree for a value and return boolean result
-   public boolean searchTree( T searchValue )
+   public int searchTree( T searchValue )
    {       
        return searchTreeHelper( root, searchValue );
    } // end searchTree() method
    
-   private boolean searchTreeHelper( TreeNode<T> node, T value )
+   private int searchTreeHelper( TreeNode<T> node, T value )
    {
-       boolean result = false;  // Determine search result
+       int result = 0;  // Determine search result
        
        // If current node is null, the item was not found in binaryTree
        if( node == null)
@@ -406,7 +461,7 @@ public class Tree< T extends Comparable< T > >
        // Match found. Return result
        else
        {
-           result = true;
+           result = node.getFrequency();
        }
        return result;
    } // end searchTreeHelper() method
@@ -438,7 +493,6 @@ public class Tree< T extends Comparable< T > >
        else
        {
            node = node;
-           System.out.println("Current node data is: " + node.data);
        }
        return node;
    } // end searchTreeHelper() method
