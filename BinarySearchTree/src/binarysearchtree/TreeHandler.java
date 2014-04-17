@@ -1,10 +1,16 @@
 /* Filename:        TreeHandler.java
- * Last Modified:   21 Feb 2014
+ * Last Modified:   4 Mar 2014
  * Author:          Todd Parker
  * Email:           todd.i.parker@maine.edu
  * Course:          CIS314 - Advanced Java
  * 
- * TreeHandler.java is ...
+ * TreeHandler.java is the class that controls user interaction with Tree.java. 
+ * It has four methods treeInterface(), treeMenu(), processNumericInput(), and
+ * processStringInput(). treeMenu() prints the user menu and returns the choice
+ * to treeInterface(); which uses a switch structure to handle the appropiate
+ * actions. processNumericInput() and processStringInput() receive the user
+ * entered values, strip special characters and whitespace, and return a token-
+ * ized array to create the binary tree.
  */
 
 package binarysearchtree;
@@ -13,73 +19,195 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
-public class TreeHandler
+public class TreeHandler< T >
 {
+    // Scanner object to receive user input
     Scanner input = new Scanner( System.in );
-    Tree< String > binaryTree;    
+    // Tree object to create and maintain a binary tree
+    Tree< String > stringBinaryTree;
+    Tree< Double > numericBinaryTree;
+    // Prompt for input to binary tree as first action of program
     private int initialRun = 1;
+    // determine if user-selected tree is numeric or string based
+    private boolean isNumericTree;
     
     public void treeInterface()
     {
         Integer menuChoice = 0;
-        String textIn = "";
+        String stringInput;
+        Double doubleInput;
         
+        // while user hasn't chosen to exit, print menu
         while( menuChoice.equals( 9 ) == false )
         {
             Student_Sig_Block.printSig();
             
+            // prompt for input on first run instead of printing menu
             if( initialRun == 1 )
             {
                 menuChoice = initialRun;
                 initialRun--;
             }
+            // get user's menu selection
             else
                 menuChoice = treeMenu();
 
             switch( menuChoice )
             {
+                // exit program
                 case 9:
                     System.out.println( "\n\nProgram execution terminated\n\n" );
                     break;
+                // Print text-based version of binary tree
                 case 8:
                     System.out.print( "\n\n" );
-                    binaryTree.outputTree();
+                    if( isNumericTree )
+                        numericBinaryTree.outputTree();
+                    else
+                        stringBinaryTree.outputTree();
                     break;
+                // Print postorder traversal
                 case 7:
-                    binaryTree.postorderTraversal();
+                    if( isNumericTree )
+                        numericBinaryTree.postorderTraversal();
+                    else
+                        stringBinaryTree.postorderTraversal();
                     break;
+                // Print preorder traversal
                 case 6:
-                    binaryTree.preorderTraversal();
+                    if( isNumericTree )
+                        numericBinaryTree.preorderTraversal();
+                    else
+                        stringBinaryTree.preorderTraversal();
                     break;
+                // Print inorder traversal
                 case 5:
-                    binaryTree.inorderTraversal();
+                    if( isNumericTree )
+                        numericBinaryTree.inorderTraversal();
+                    else
+                        stringBinaryTree.inorderTraversal();
                     break;
+                // Prompt for and delete value from tree, if it exists
                 case 4:
                     System.out.print( "\n\nEnter a value for deletion: " );
-                    textIn = input.next();
-                    input.nextLine();
-                    binaryTree.deleteNode(textIn, true);
+                    if( isNumericTree )
+                    {
+                        // declare and initialize double variable
+                        doubleInput = new Double(0);
+                        
+                        // catch invalid delete entry type
+                        try
+                        {
+                            doubleInput = input.nextDouble();
+                            input.nextLine();
+                            numericBinaryTree.deleteNode( doubleInput , true);                            
+                        }
+                        catch( NumberFormatException s )
+                        {
+                            System.out.println( "\n\tERROR: please enter a number.\n\n" );
+                        } // end try...catch
+                    }
+                    else
+                    {
+                        stringInput = input.next();
+                        input.nextLine();
+                        stringBinaryTree.deleteNode(stringInput, true);
+                    }
                     break;
+                // Prompt for and delete all values from tree, if it exists
                 case 3:
                    System.out.print( "\n\nEnter a value for deletion: " );
-                    textIn = input.next();
-                    input.nextLine();
-                    binaryTree.deleteNode(textIn, false);                    
+                    if( isNumericTree )
+                    {
+                        // declare and initialize double variable
+                        doubleInput = new Double(0);
+                        
+                        // catch invalid delete entry type
+                        try
+                        {
+                            doubleInput = input.nextDouble();
+                            input.nextLine();
+                            numericBinaryTree.deleteNode( doubleInput , false);                            
+                        }
+                        catch( NumberFormatException s )
+                        {
+                            System.out.println( "\n\tERROR: please enter a number.\n\n" );
+                        } // end try...catch
+                    } // end if deleting a number
+                    else
+                    {
+                        // declare and initialize string variable
+                        stringInput = new String("");
+                        
+                        // catch invalid delete entry
+                        stringInput = input.next();
+                        input.nextLine();
+                        stringBinaryTree.deleteNode(stringInput, false);
+                    } // end else deleting a string          
                     break;
+                // Prompt for value to search tree for
                 case 2:
+                    int searchResult = 0;
                    System.out.print( "\n\nEnter a search value: " );
-                    textIn = input.next();
-                    input.nextLine();
-                    int searchResult = binaryTree.searchTree(textIn);
-                    System.out.println( searchResult >= 1 ? "\n\t\"" + textIn + "\" occurs (" + searchResult +") times in the tree\n" : "\n\t\"" + textIn + "\" was not found in the tree\n");                    
+                   if( isNumericTree )
+                   {
+                       doubleInput = input.nextDouble();
+                       input.nextLine();
+                       searchResult = numericBinaryTree.searchTree(doubleInput);
+                       System.out.println( searchResult >= 1 ? "\n\t\"" + doubleInput + "\" occurs (" + searchResult +") times in the tree\n" : "\n\t\"" + doubleInput + "\" was not found in the tree\n");                       
+                   }
+                   else
+                   {
+                       stringInput = input.next();
+                       input.nextLine();
+                       searchResult = stringBinaryTree.searchTree(stringInput);
+                       System.out.println( searchResult >= 1 ? "\n\t\"" + stringInput + "\" occurs (" + searchResult +") times in the tree\n" : "\n\t\"" + stringInput + "\" was not found in the tree\n");                         
+                   }
                     break;
+                // Create new String or Numeric binary tree
                 case 1:
-                    System.out.println( "\nPlease type what you would like inserted into a tree:\n" );
-                    textIn = input.nextLine();
-                    List<String> tokenizedText = Arrays.asList( processText(textIn) );
-                    binaryTree = new Tree<>( tokenizedText );
-                    System.out.println( "\n\t\tTree created successfully\n\n" );
+                    int treeType;
+                    
+                    do
+                    {
+                        treeType = 0;
+                        
+                        System.out.println( "\nWould you like to enter Numeric or String values?\n" );
+                        System.out.print( "\t1 - Numeric\n"
+                                        + "\t2 - String\n"
+                                        + "Choice: " );
+                        // Determine if user wishes to create a numeric or string tree
+                        try
+                        {
+                            treeType = Integer.parseInt( input.nextLine() );
+                            if( treeType == 1 )
+                                isNumericTree = true;
+                            else
+                                isNumericTree = false;
+                        }
+                        catch(Exception e)
+                        {
+                            System.out.println( "\nERROR: invalid input, please try again." );
+                        }                        
+                    } while( (treeType < 1) || (treeType > 2) );
+                    
+                    if( isNumericTree )
+                    {
+                        System.out.println( "\nPlease enter some numbers:\n" );
+                        stringInput = input.nextLine();
+                        List<Double> tokenizedText = Arrays.asList( processNumericInput( stringInput ) );
+                        numericBinaryTree = new Tree<>( tokenizedText );
+                    }
+                    else
+                    {
+                        System.out.println( "\nPlease enter some text:\n" );
+                        stringInput = input.nextLine();
+                        List<String> tokenizedText = Arrays.asList( processStringInput(stringInput) );
+                        stringBinaryTree = new Tree<>( tokenizedText );     
+                    }
+                    
                     break;
+                // Default case, should not be reachable
                 default:
                     System.out.println( "Default case" );
                     
@@ -126,16 +254,43 @@ public class TreeHandler
         return menuChoice;
     } // end createTreeMenu() method
     
-    private String[] processText( String textIn)
+    // Process string input, removing punctuation and whitespaces; and sort list in ascending order
+    private String[] processStringInput( String userInput)
     {
         // Remove all punctuation
-        textIn = textIn.replaceAll( "[^A-Za-z\\s]" , "" );
+        userInput = userInput.replaceAll( "[^A-Za-z\\s]" , "" );
         // Tokenize string by whitespace characters
-        String[] textInTokens = textIn.split( "\\s" );
+        String[] userInputTokens = userInput.split( "\\s" );
         
-        Arrays.sort( textInTokens ); // Sort tokens in ascending order
+//        Arrays.sort( userInputTokens ); // Sort tokens in ascending order
         
-        return textInTokens;
-    } // end processText    
+        return userInputTokens;
+    } // end processStringInput
+    
+    // Process numeric string input into double values, removing erroneous entries, punctuation, and whitespaces; and sort list in ascending order
+    private Double[] processNumericInput( String userInput)
+    {
+        // Remove all punctuation
+        userInput = userInput.replaceAll( "[^0-9\\s]" , "" );
+        // Tokenize string by whitespace characters
+        String[] userInputTokens = userInput.split( "\\s" );
+        Double[] numericTokens = new Double[userInputTokens.length];
+        
+        for( int i = 0; i < userInputTokens.length; i++ )
+        {
+            try
+            {
+                numericTokens[i] = Double.parseDouble( userInputTokens[ i ] ); 
+            }
+            catch( Exception e )
+            {
+                return numericTokens = new Double[0];
+            }
+        }
+        
+//        Arrays.sort( numericTokens ); // Sort tokens in ascending order
+        
+        return numericTokens;
+    } // end processNumericInput    
     
 } // end treeHandler class

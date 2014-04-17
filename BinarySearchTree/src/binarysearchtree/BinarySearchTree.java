@@ -1,12 +1,14 @@
 /* Filename:        BinarySearchTree.java
- * Last Modified:   15 Feb 2014
+ * Last Modified:   04 Mar 2014
  * Author:          Todd Parker
  * Email:           todd.i.parker@maine.edu
  * Course:          CIS314 - Advanced Java
  * 
- * NOTE: Code was adopted from "Java - How To Program" by Deitel and Deitel
- * 
- * BinarySearchTree.java is ...
+ * BinarySearchTree.java allows a user to enter either text or numbers and then 
+ * creates a binary tree from the entered data. Once running, a command line
+ * menu interface is presented to the user to control operations, such as adding
+ * a new tree, searching the tree for values, deleting values, and printing
+ * both textual and in/post/pre-order traversals.
  */
 
 package binarysearchtree;
@@ -14,11 +16,11 @@ package binarysearchtree;
 public class BinarySearchTree
 {
     public static void main(String[] args)
-    {
-//        String textIn = "apple cat dog";
-//        String textIn = "cat dog snake mango zebra zonk cronk sake";
-//        String textIn = "DURING the whole of a dull, dark, and soundless day in the autumn of the year, when the clouds hung oppressively low in the heavens, I had been passing alone, on horseback, through a singularly dreary tract of country; and at length found myself, as the shades of the evening drew on, within view of the melancholy House of Usher. year";     
+    {  
         TreeHandler tree = new TreeHandler();
         tree.treeInterface();
     }
 } // BinarySearchTree class
+
+
+
